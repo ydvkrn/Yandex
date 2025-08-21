@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📱 Yandex Direct - Mobile API</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 15px;
+        }
+        
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 1.8em;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 25px;
+            font-size: 0.9em;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 0.9em;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="text"]:focus {
+            border-color: #667eea;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+        
+        .result-section {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: monospace;
+            min-height: 80px;
+            resize: vertical;
+        }
+        
+        .btn-copy {
+            background: #28a745;
+            color: white;
+            margin-top: 10px;
+        }
+        
+        .alert {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .loading {
+            text-align: center;
+            display: none;
+            padding: 20px;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .file-info {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+            border-left: 4px solid #007bff;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📱 Yandex Direct API</h1>
+        <p class="subtitle">Mobile-deployed worker for direct downloads</p>
+
+        <div class="input-group">
+            <label for="yandexLink">📎 Yandex Disk Link:</label>
+            <input type="text" 
+                   id="yandexLink" 
+                   placeholder="https://disk.yandex.com/i/..." 
+                   autocomplete="off">
+        </div>
+
+        <button class="btn btn-primary" onclick="generateDirectLink()">
+            🚀 Generate Direct Link
+        </button>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Processing...</p>
+        </div>
+
+        <div class="result-section" id="resultSection">
+            <label>✨ Direct Download Link:</label>
+            <textarea id="result" readonly></textarea>
+            
+            <button class="btn btn-copy" onclick="copyLink()">
+                📋 Copy Link
+            </button>
+            
+            <button class="btn btn-copy" onclick="downloadFile()" style="background: #17a2b8;">
+                ⬇️ Download Now
+            </button>
+            
+            <div class="file-info" id="fileInfo" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        // आपके deployed worker का URL यहाँ डालें
+        const API_BASE = 'https://your-worker-name.your-subdomain.workers.dev';
+        
+        let currentDirectLink = '';
+
+        function showAlert(message, type) {
+            const existing = document.querySelector('.alert');
+            if (existing) existing.remove();
+
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            document.querySelector('.container').insertBefore(alert, document.querySelector('.input-group'));
+            
+            setTimeout(() => alert.remove(), 3000);
+        }
+
+        async function generateDirectLink() {
+            const url = document.getElementById('yandexLink').value.trim();
+            
+            if (!url) {
+                showAlert('Please paste a Yandex Disk link!', 'error');
+                return;
+            }
+
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('resultSection').style.display = 'none';
+
+            try {
+                const response = await fetch(`${API_BASE}/api/direct?url=${encodeURIComponent(url)}`);
+                const data = await response.json();
+                
+                if (data.success && data.direct_url) {
+                    currentDirectLink = data.direct_url;
+                    document.getElementById('result').value = currentDirectLink;
+                    document.getElementById('resultSection').style.display = 'block';
+                    
+                    // Get file info
+                    await getFileInfo(url);
+                    
+                    showAlert('✅ Direct link generated successfully!', 'success');
+                } else {
+                    throw new Error(data.error || 'Unknown error occurred');
+                }
+            } catch (error) {
+                document.getElementById('result').value = `Error: ${error.message}`;
+                document.getElementById('resultSection').style.display = 'block';
+                showAlert(`Failed: ${error.message}`, 'error');
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+
+        async function getFileInfo(originalUrl) {
+            try {
+                const response = await fetch(`${API_BASE}/api/info?url=${encodeURIComponent(originalUrl)}`);
+                const data = await response.json();
+                
+                if (data.success && data.file_info) {
+                    const info = data.file_info;
+                    const fileInfo = document.getElementById('fileInfo');
+                    
+                    fileInfo.innerHTML = `
+                        <strong>📄 File Details:</strong><br>
+                        <strong>Name:</strong> ${info.name}<br>
+                        <strong>Size:</strong> ${info.size_formatted}<br>
+                        <strong>Type:</strong> ${info.mime_type}
+                        ${info.is_video ? '<br>🎥 Video File' : ''}
+                        ${info.is_image ? '<br>🖼️ Image File' : ''}
+                    `;
+                    fileInfo.style.display = 'block';
+                }
+            } catch (error) {
+                console.log('Could not fetch file info:', error);
+            }
+        }
+
+        async function copyLink() {
+            if (!currentDirectLink) {
+                showAlert('No link to copy!', 'error');
+                return;
+            }
+
+            try {
+                await navigator.clipboard.writeText(currentDirectLink);
+                showAlert('📋 Link copied!', 'success');
+            } catch (err) {
+                showAlert('📋 Copy failed', 'error');
+            }
+        }
+
+        function downloadFile() {
+            if (!currentDirectLink) {
+                showAlert('No link to download!', 'error');
+                return;
+            }
+            
+            window.open(currentDirectLink, '_blank');
+            showAlert('⬇️ Download started!', 'success');
+        }
+
+        // Enter key support
+        document.getElementById('yandexLink').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                generateDirectLink();
+            }
+        });
+    </script>
+</body>
+</html>
