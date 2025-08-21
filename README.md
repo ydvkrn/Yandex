@@ -1,1 +1,1 @@
-# Yandex
+[![Deploy to Cloudflare Workers](https://camo.githubusercontent.com/1f3d0b4d44a2c3f12c78bd02bae907169430e04d728006db9f97a4c98d1b33cf/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f6465706c6f792d746f253230636c6f7564666c6172652d6f72616e67653f7374796c653d666c61742d737175617265)](https://api-yandex-downloader.btfcompanystorage.workers.dev/?url=https://github.com/ydvkrn/Yandex)
