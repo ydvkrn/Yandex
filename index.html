@@ -3,300 +3,613 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📱 Yandex Direct - Mobile API</title>
+    <title>🚀 Yandex Direct Downloader</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: backgroundShift 10s ease-in-out infinite alternate;
         }
-        
+
+        @keyframes backgroundShift {
+            0% { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+            100% { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        }
+
         .container {
-            max-width: 500px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            padding: 25px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 40px;
+            width: 100%;
+            max-width: 580px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: slideUp 0.6s ease-out;
+            position: relative;
+            overflow: hidden;
         }
-        
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #f5576c);
+            background-size: 300% 100%;
+            animation: gradientMove 3s ease-in-out infinite;
+        }
+
+        @keyframes gradientMove {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .logo {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
         h1 {
-            text-align: center;
-            color: #333;
+            font-size: 2.2em;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             margin-bottom: 8px;
-            font-size: 1.8em;
         }
-        
+
         .subtitle {
-            text-align: center;
             color: #666;
-            margin-bottom: 25px;
-            font-size: 0.9em;
+            font-size: 1.1em;
+            font-weight: 400;
         }
-        
-        .input-group {
-            margin-bottom: 20px;
+
+        .input-section {
+            margin-bottom: 30px;
         }
-        
-        label {
+
+        .input-label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
             font-weight: 600;
             color: #333;
-            font-size: 0.9em;
+            font-size: 1em;
         }
-        
-        input[type="text"] {
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-field {
             width: 100%;
-            padding: 15px;
-            border: 2px solid #e1e5e9;
-            border-radius: 12px;
+            padding: 18px 50px 18px 20px;
+            border: 2px solid #e1e8f0;
+            border-radius: 16px;
             font-size: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             outline: none;
-            transition: border-color 0.3s;
+            background: rgba(255, 255, 255, 0.9);
         }
-        
-        input[type="text"]:focus {
+
+        .input-field:focus {
             border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            background: white;
+            transform: translateY(-2px);
         }
-        
-        .btn {
+
+        .input-icon {
+            position: absolute;
+            right: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            font-size: 1.2em;
+        }
+
+        .btn-primary {
             width: 100%;
-            padding: 15px;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border: none;
-            border-radius: 12px;
+            border-radius: 16px;
+            color: white;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            margin-bottom: 10px;
-            transition: all 0.3s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
         }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-        
-        .btn-primary:active {
-            transform: scale(0.98);
-        }
-        
-        .result-section {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 12px;
-            margin-top: 20px;
-            display: none;
-        }
-        
-        textarea {
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
             width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 14px;
-            font-family: monospace;
-            min-height: 80px;
-            resize: vertical;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
         }
-        
-        .btn-copy {
-            background: #28a745;
-            color: white;
-            margin-top: 10px;
+
+        .btn-primary:hover::before {
+            left: 100%;
         }
-        
-        .alert {
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            font-size: 14px;
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
         }
-        
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+
+        .btn-primary:active {
+            transform: translateY(-1px);
         }
-        
-        .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
-        
+
         .loading {
-            text-align: center;
             display: none;
+            text-align: center;
             padding: 20px;
+            animation: pulse 1.5s ease-in-out infinite;
         }
-        
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
         .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #667eea;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #667eea;
             border-radius: 50%;
-            width: 30px;
-            height: 30px;
             animation: spin 1s linear infinite;
-            margin: 0 auto 10px;
+            margin: 0 auto 15px;
         }
-        
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        
-        .file-info {
+
+        .result-section {
+            background: linear-gradient(135deg, #e8f5e8, #f0f8f0);
+            padding: 25px;
+            border-radius: 16px;
+            margin-top: 25px;
+            border: 2px solid #4ade80;
+            display: none;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            font-weight: 600;
+            color: #166534;
+            font-size: 1.1em;
+        }
+
+        .result-header i {
+            margin-right: 10px;
+            font-size: 1.3em;
+        }
+
+        .result-url {
             background: white;
-            padding: 12px;
-            border-radius: 8px;
-            margin-top: 10px;
-            border-left: 4px solid #007bff;
-            font-size: 13px;
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid #d1fae5;
+            word-break: break-all;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: #374151;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-secondary {
+            flex: 1;
+            padding: 12px 20px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .error-section {
+            background: linear-gradient(135deg, #fee2e2, #fef2f2);
+            padding: 25px;
+            border-radius: 16px;
+            margin-top: 25px;
+            border: 2px solid #ef4444;
+            display: none;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .error-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #dc2626;
+            font-size: 1.1em;
+        }
+
+        .error-header i {
+            margin-right: 10px;
+            font-size: 1.3em;
+        }
+
+        .error-message {
+            color: #7f1d1d;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .features {
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .feature-item {
+            text-align: center;
+            padding: 15px;
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+        }
+
+        .feature-icon {
+            font-size: 1.8em;
+            margin-bottom: 8px;
+            color: #667eea;
+        }
+
+        .feature-text {
+            font-size: 0.9em;
+            font-weight: 500;
+            color: #4b5563;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #6b7280;
+            font-size: 0.85em;
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                margin: 10px;
+                padding: 25px;
+            }
+            
+            h1 {
+                font-size: 1.8em;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>📱 Yandex Direct API</h1>
-        <p class="subtitle">Mobile-deployed worker for direct downloads</p>
-
-        <div class="input-group">
-            <label for="yandexLink">📎 Yandex Disk Link:</label>
-            <input type="text" 
-                   id="yandexLink" 
-                   placeholder="https://disk.yandex.com/i/..." 
-                   autocomplete="off">
+        <div class="header">
+            <div class="logo">🚀</div>
+            <h1>Yandex Direct Downloader</h1>
+            <p class="subtitle">Convert sharing links to direct download URLs</p>
         </div>
 
-        <button class="btn btn-primary" onclick="generateDirectLink()">
-            🚀 Generate Direct Link
+        <div class="input-section">
+            <label class="input-label" for="yandexLink">
+                <i class="fas fa-link"></i> Yandex Disk Share Link
+            </label>
+            <div class="input-wrapper">
+                <input 
+                    type="text" 
+                    class="input-field" 
+                    id="yandexLink" 
+                    placeholder="https://disk.yandex.com/i/..." 
+                    autocomplete="off"
+                    autofocus>
+                <i class="fas fa-paste input-icon" onclick="pasteFromClipboard()" style="cursor: pointer;"></i>
+            </div>
+        </div>
+
+        <button class="btn-primary" onclick="generateDirectLink()" id="generateBtn">
+            <i class="fas fa-magic"></i>
+            Generate Direct Link
         </button>
 
         <div class="loading" id="loading">
             <div class="spinner"></div>
-            <p>Processing...</p>
+            <p><i class="fas fa-cog fa-spin"></i> Processing your link...</p>
         </div>
 
         <div class="result-section" id="resultSection">
-            <label>✨ Direct Download Link:</label>
-            <textarea id="result" readonly></textarea>
-            
-            <button class="btn btn-copy" onclick="copyLink()">
-                📋 Copy Link
-            </button>
-            
-            <button class="btn btn-copy" onclick="downloadFile()" style="background: #17a2b8;">
-                ⬇️ Download Now
-            </button>
-            
-            <div class="file-info" id="fileInfo" style="display: none;"></div>
+            <div class="result-header">
+                <i class="fas fa-check-circle"></i>
+                Direct Download Link Generated!
+            </div>
+            <div class="result-url" id="resultUrl"></div>
+            <div class="btn-group">
+                <button class="btn-secondary" onclick="copyToClipboard()">
+                    <i class="fas fa-copy"></i> Copy Link
+                </button>
+                <a class="btn-secondary" id="downloadLink" href="#" target="_blank">
+                    <i class="fas fa-download"></i> Download Now
+                </a>
+            </div>
+        </div>
+
+        <div class="error-section" id="errorSection">
+            <div class="error-header">
+                <i class="fas fa-exclamation-triangle"></i>
+                Error Occurred
+            </div>
+            <div class="error-message" id="errorMessage"></div>
+        </div>
+
+        <div class="features">
+            <div class="features-grid">
+                <div class="feature-item">
+                    <div class="feature-icon"><i class="fas fa-bolt"></i></div>
+                    <div class="feature-text">Lightning Fast</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+                    <div class="feature-text">Secure & Safe</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon"><i class="fas fa-mobile-alt"></i></div>
+                    <div class="feature-text">Mobile Ready</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon"><i class="fas fa-infinity"></i></div>
+                    <div class="feature-text">Unlimited Use</div>
+                </div>
+            </div>
+            <div class="footer">
+                Powered by Cloudflare Workers • No data stored • Open Source
+            </div>
         </div>
     </div>
 
     <script>
-        // आपके deployed worker का URL यहाँ डालें
-        const API_BASE = 'https://api-yandex-downloader.btfcompanystorage.workers.dev/';
-        
+        const API_BASE = 'https://api-yandex-downloader.btfcompanystorage.workers.dev';
         let currentDirectLink = '';
 
-        function showAlert(message, type) {
-            const existing = document.querySelector('.alert');
-            if (existing) existing.remove();
-
-            const alert = document.createElement('div');
-            alert.className = `alert alert-${type}`;
-            alert.textContent = message;
-            document.querySelector('.container').insertBefore(alert, document.querySelector('.input-group'));
-            
-            setTimeout(() => alert.remove(), 3000);
+        // Auto-paste functionality
+        async function pasteFromClipboard() {
+            try {
+                const text = await navigator.clipboard.readText();
+                if (text && (text.includes('disk.yandex.com') || text.includes('yadi.sk'))) {
+                    document.getElementById('yandexLink').value = text;
+                    showNotification('Link pasted from clipboard!', 'success');
+                }
+            } catch (err) {
+                console.log('Clipboard access denied');
+            }
         }
 
+        // Auto-paste on page load
+        window.addEventListener('load', pasteFromClipboard);
+
         async function generateDirectLink() {
-            const url = document.getElementById('yandexLink').value.trim();
-            
+            const urlInput = document.getElementById('yandexLink');
+            const loading = document.getElementById('loading');
+            const resultSection = document.getElementById('resultSection');
+            const errorSection = document.getElementById('errorSection');
+            const generateBtn = document.getElementById('generateBtn');
+
+            // Hide previous results
+            resultSection.style.display = 'none';
+            errorSection.style.display = 'none';
+
+            const url = urlInput.value.trim();
+
+            // Validation
             if (!url) {
-                showAlert('Please paste a Yandex Disk link!', 'error');
+                showError('Please paste a Yandex Disk link');
                 return;
             }
 
-            document.getElementById('loading').style.display = 'block';
-            document.getElementById('resultSection').style.display = 'none';
+            if (!url.includes('disk.yandex.com') && !url.includes('yadi.sk')) {
+                showError('Invalid Yandex Disk URL. Please use a valid Yandex Disk sharing link.');
+                return;
+            }
+
+            // Show loading state
+            loading.style.display = 'block';
+            generateBtn.disabled = true;
+            generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
 
             try {
-                const response = await fetch(`${API_BASE}/api/direct?url=${encodeURIComponent(url)}`);
+                const response = await fetch(`${API_BASE}/api/direct?url=${encodeURIComponent(url)}`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                });
+
                 const data = await response.json();
-                
+
                 if (data.success && data.direct_url) {
                     currentDirectLink = data.direct_url;
-                    document.getElementById('result').value = currentDirectLink;
-                    document.getElementById('resultSection').style.display = 'block';
-                    
-                    // Get file info
-                    await getFileInfo(url);
-                    
-                    showAlert('✅ Direct link generated successfully!', 'success');
+                    showResult(data.direct_url);
+                    showNotification('Direct link generated successfully!', 'success');
                 } else {
-                    throw new Error(data.error || 'Unknown error occurred');
+                    showError(data.error || 'Failed to generate direct download link');
                 }
+
             } catch (error) {
-                document.getElementById('result').value = `Error: ${error.message}`;
-                document.getElementById('resultSection').style.display = 'block';
-                showAlert(`Failed: ${error.message}`, 'error');
+                console.error('Fetch error:', error);
+                showError('Network error occurred. Please check your connection and try again.');
             } finally {
-                document.getElementById('loading').style.display = 'none';
+                // Hide loading state
+                loading.style.display = 'none';
+                generateBtn.disabled = false;
+                generateBtn.innerHTML = '<i class="fas fa-magic"></i> Generate Direct Link';
             }
         }
 
-        async function getFileInfo(originalUrl) {
-            try {
-                const response = await fetch(`${API_BASE}/api/info?url=${encodeURIComponent(originalUrl)}`);
-                const data = await response.json();
-                
-                if (data.success && data.file_info) {
-                    const info = data.file_info;
-                    const fileInfo = document.getElementById('fileInfo');
-                    
-                    fileInfo.innerHTML = `
-                        <strong>📄 File Details:</strong><br>
-                        <strong>Name:</strong> ${info.name}<br>
-                        <strong>Size:</strong> ${info.size_formatted}<br>
-                        <strong>Type:</strong> ${info.mime_type}
-                        ${info.is_video ? '<br>🎥 Video File' : ''}
-                        ${info.is_image ? '<br>🖼️ Image File' : ''}
-                    `;
-                    fileInfo.style.display = 'block';
-                }
-            } catch (error) {
-                console.log('Could not fetch file info:', error);
-            }
+        function showResult(directUrl) {
+            const resultSection = document.getElementById('resultSection');
+            const resultUrl = document.getElementById('resultUrl');
+            const downloadLink = document.getElementById('downloadLink');
+
+            resultUrl.textContent = directUrl;
+            downloadLink.href = directUrl;
+            resultSection.style.display = 'block';
+
+            // Smooth scroll to result
+            resultSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
 
-        async function copyLink() {
+        function showError(message) {
+            const errorSection = document.getElementById('errorSection');
+            const errorMessage = document.getElementById('errorMessage');
+
+            errorMessage.textContent = message;
+            errorSection.style.display = 'block';
+
+            // Smooth scroll to error
+            errorSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        async function copyToClipboard() {
             if (!currentDirectLink) {
-                showAlert('No link to copy!', 'error');
+                showNotification('No link to copy!', 'error');
                 return;
             }
 
             try {
                 await navigator.clipboard.writeText(currentDirectLink);
-                showAlert('📋 Link copied!', 'success');
+                showNotification('Link copied to clipboard!', 'success');
             } catch (err) {
-                showAlert('📋 Copy failed', 'error');
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = currentDirectLink;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showNotification('Link copied to clipboard!', 'success');
             }
         }
 
-        function downloadFile() {
-            if (!currentDirectLink) {
-                showAlert('No link to download!', 'error');
-                return;
-            }
-            
-            window.open(currentDirectLink, '_blank');
-            showAlert('⬇️ Download started!', 'success');
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                border-radius: 8px;
+                color: white;
+                font-weight: 600;
+                z-index: 1000;
+                animation: slideInRight 0.3s ease-out;
+                ${type === 'success' ? 'background: #10b981;' : 'background: #ef4444;'}
+            `;
+            notification.textContent = message;
+
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.3s ease-in forwards';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
         }
 
         // Enter key support
@@ -305,6 +618,20 @@
                 generateDirectLink();
             }
         });
+
+        // Add CSS for notifications
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOutRight {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>
